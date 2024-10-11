@@ -21,23 +21,9 @@ This project provides a utility to manage and download the appropriate version o
 - Python 3.9+
 - Google Chrome installed on your machine
 
-### Dependencies
-
-The project requires the following Python packages:
-- `requests`
-- `pandas`
-- `selenium`
-- `packaging`
-
-You can install the dependencies with the following command:
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Installation
 
-To use this utility, clone the repository and install the dependencies:
+To use this utility, simply install it directly from the repository with the following command:
 
 ```bash
 pip install git+https://github.com/Linear-Logic-inc/customchromedriver
