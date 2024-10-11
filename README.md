@@ -40,7 +40,7 @@ pip install -r requirements.txt
 To use this utility, clone the repository and install the dependencies:
 
 ```bash
-pip install git+https://github.com/FumiYoshida/remoteexecute
+pip install git+https://github.com/Linear-Logic-inc/customchromedriver
 ```
 
 ## Usage
