@@ -8,6 +8,7 @@ This project provides a utility to manage and download the appropriate version o
   <img src="https://img.shields.io/badge/license-MIT-blue.svg">
  </a>
 </p>
+
 ## Features
 
 - **ChromeDriver Version Management**: Automatically downloads and installs the correct ChromeDriver version based on the installed Chrome version.
@@ -88,7 +89,9 @@ tables = driver.read_html(xpath="//table[@id='example']")
 
 ## ChromeDriver Version Management
 
-The `ChromeVersionManager` class handles version matching between Chrome and ChromeDriver.
+The `ChromeVersionManager` class handles version matching between Chrome and ChromeDriver. When you use the `CustomChromeDriver` class, the correct version of ChromeDriver is automatically downloaded and updated if it does not match the installed Chrome version.
+
+However, you can also manually check and update the ChromeDriver version if needed.
 
 To get the current Chrome version:
 
@@ -97,11 +100,13 @@ chrome_version = ChromeVersionManager.get_chrome_version()
 print(f"Current Chrome version: {chrome_version}")
 ```
 
-To download and update ChromeDriver to the correct version:
+To manually download and update ChromeDriver to the correct version:
 
 ```python
 update_chromedriver()
 ```
+
+Even though `CustomChromeDriver` automatically updates the ChromeDriver when needed, calling `update_chromedriver()` ensures that the correct version is downloaded and installed, allowing you to control the process manually.
 
 ## License
 
