@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *実装中.ipynb
+*ChromeDriver/
 
 # C extensions
 *.so
