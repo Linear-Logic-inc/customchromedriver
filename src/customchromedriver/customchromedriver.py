@@ -48,22 +48,31 @@ class ChromeVersionManager:
         target_major_version = ChromeVersionManager.get_major_version(target_version)
         closest_version = None
         smallest_diff_tuple = None
+    
+        # メジャーバージョン一覧を作成
+        major_versions = set()
         
         for v in df['Version']:
             parsed_v = version.parse(v)
             major_version = ChromeVersionManager.get_major_version(parsed_v)
+            major_versions.add(major_version)
             
             # メジャーバージョンが一致する場合にのみ比較
             if major_version == target_major_version:
-                # バージョン間の差分の絶対値をタプルとして計算
                 diff_tuple = ChromeVersionManager.version_diff_tuple(parsed_v, target_version)
                 
-                # 最初の一致か、タプルを辞書順で比較して差が小さい場合に更新
                 if smallest_diff_tuple is None or diff_tuple < smallest_diff_tuple:
                     smallest_diff_tuple = diff_tuple
                     closest_version = v
-        
+    
+        # 一致するメジャーバージョンが見つからなかった場合にエラーを発生させる
+        if closest_version is None:
+            major_versions_list = ', '.join(map(str, sorted(major_versions)))
+            raise ValueError(f"No matching major version found for target version {target_version}. "
+                             f"Please update your Chrome version to one of the following major versions: {major_versions_list}.")
+    
         return closest_version
+
 
     @staticmethod
     def get_chromedriver_url():
@@ -144,7 +153,9 @@ class CustomChromeDriver(webdriver.Chrome):
         options.use_chromium = True
         if headless:
             options.add_argument('--headless')
-
+            # Chrome129のchromedriverをheadlessモードで起動した際、白いウィンドウが出るバグがある
+            # 回避策として、headlessモードのとき、ウィンドウ位置を端にする
+            options.add_argument("--window-position=-2400,-2400")
         try:
             chromedriver_path = next(get_chromedriver_dir().glob('**/chromedriver.exe'))
         except StopIteration:
