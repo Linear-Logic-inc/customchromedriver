@@ -137,7 +137,7 @@ def update_chromedriver():
     
 
 class CustomChromeDriver(webdriver.Chrome):
-    def __init__(self, headless=False, download_folder=None):
+    def __init__(self, headless=False, download_folder=None, profile=None):
         """
         Initialize and return a Chrome WebDriver instance.
 
@@ -164,6 +164,10 @@ class CustomChromeDriver(webdriver.Chrome):
             update_chromedriver()
             chromedriver_path = next(get_chromedriver_dir().glob('**/chromedriver.exe'))
 
+        if profile is not None:
+            options.add_argument(f"user-data-dir={os.path.join(os.environ['LOCALAPPDATA'], 'Google', 'Chrome', 'User Data')}")
+            options.add_argument(f"profile-directory={profile}")
+        
         # WebDriverWaitを使うことを考慮し、全要素の読み込みを待たずにdriver.get関数を返すように変更
         options.page_load_strategy = 'eager'
 
