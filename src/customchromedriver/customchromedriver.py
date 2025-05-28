@@ -5,6 +5,8 @@ import tempfile
 from io import StringIO
 from pathlib import Path
 import winreg
+import subprocess
+import tempfile
 
 import requests
 from packaging import version
@@ -16,6 +18,53 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import SessionNotCreatedException, TimeoutException
+
+INSTRUCTION_HTML = """\
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>初期設定手順</title>
+</head>
+<body>
+    <h2>Chrome プロファイル初期設定</h2>
+    <ol>
+        <li>対象サイト（例：SBI証券）にアクセスしてください。</li>
+        <li>ログインと2段階認証を完了してください。</li>
+        <li>「このパスワードを保存しますか？」→「保存しない」を選択してください。</li>
+        <li>設定が完了したら、このウィンドウを閉じてください。</li>
+    </ol>
+    <p style="color: gray;">※このページは自動化用プロファイルの初期化目的で表示されています。</p>
+</body>
+</html>
+"""
+
+def ensure_profile(profile: str, chrome_path: str = r"C:\Program Files\Google\Chrome\Application\chrome.exe"):
+    profile_path = Path(f"C:/selenium_profiles/{profile}")
+    
+    if not profile_path.exists():
+        print(f"[INFO] プロファイル '{profile}' が存在しません。初期化を行います。")
+
+        # 一時HTMLファイル作成
+        with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False, encoding="utf-8") as f:
+            f.write(INSTRUCTION_HTML)
+            instruction_path = f.name
+
+        # Chromeで起動＋手順ページ表示
+        subprocess.Popen([
+            chrome_path,
+            f"--user-data-dir={profile_path}",
+            "--new-window",
+            "file:///" + instruction_path.replace("\\", "/")
+        ])
+
+        print(f"[ACTION] Chromeが起動しました。初期設定を行い、完了したらウィンドウを閉じてください。")
+        input("[ENTER] 続行するにはEnterキーを押してください。")
+
+        # （任意）初期化後にファイル削除したければコメントを外す
+        # os.remove(instruction_path)
+
+    return str(profile_path)
 
 
 def get_chromedriver_dir():
@@ -165,8 +214,8 @@ class CustomChromeDriver(webdriver.Chrome):
             chromedriver_path = next(get_chromedriver_dir().glob('**/chromedriver.exe'))
 
         if profile is not None:
-            options.add_argument(f"user-data-dir=C:/selenium_profiles/MyProfile")
-            #options.add_argument(f"profile-directory={profile}")
+            user_data_dir = ensure_profile(profile)
+            options.add_argument(f"user-data-dir={user_data_dir}")
         
         # WebDriverWaitを使うことを考慮し、全要素の読み込みを待たずにdriver.get関数を返すように変更
         options.page_load_strategy = 'eager'
