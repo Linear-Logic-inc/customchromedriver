@@ -73,6 +73,26 @@ Or, to read tables from a specific XPath:
 tables = driver.read_html(xpath="//table[@id='example']")
 ```
 
+### 5. Using Custom Chrome Profiles
+
+You can specify a custom Chrome profile to be used by the WebDriver session. If the specified profile does not exist, it will be initialized automatically and Chrome will open with a setup guide.
+
+```python
+driver = CustomChromeDriver(profile="my_profile")
+```
+
+When the profile does not exist in `C:/selenium_profiles/my_profile`, Chrome will:
+
+1. Launch with the new profile directory.
+2. Display an instruction page prompting you to:
+
+   * Log in to your target website (e.g., SBI証券).
+   * Complete multi-factor authentication if necessary.
+   * Choose "Never save password" when prompted by Chrome.
+3. After setup, close the Chrome window and press Enter in the console to continue.
+
+Once initialized, the same profile can be reused for future sessions without repeating the setup.
+
 ## ChromeDriver Version Management
 
 The `ChromeVersionManager` class handles version matching between Chrome and ChromeDriver. When you use the `CustomChromeDriver` class, the correct version of ChromeDriver is automatically downloaded and updated if it does not match the installed Chrome version.
