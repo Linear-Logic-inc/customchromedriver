@@ -165,8 +165,8 @@ class CustomChromeDriver(webdriver.Chrome):
             chromedriver_path = next(get_chromedriver_dir().glob('**/chromedriver.exe'))
 
         if profile is not None:
-            options.add_argument(f"user-data-dir={os.path.join(os.environ['LOCALAPPDATA'], 'Google', 'Chrome', 'User Data')}")
-            options.add_argument(f"profile-directory={profile}")
+            options.add_argument(f"user-data-dir=C:/selenium_profiles/MyProfile")
+            #options.add_argument(f"profile-directory={profile}")
         
         # WebDriverWaitを使うことを考慮し、全要素の読み込みを待たずにdriver.get関数を返すように変更
         options.page_load_strategy = 'eager'
