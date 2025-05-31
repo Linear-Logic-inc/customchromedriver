@@ -114,6 +114,20 @@ update_chromedriver()
 
 Even though `CustomChromeDriver` automatically updates the ChromeDriver when needed, calling `update_chromedriver()` ensures that the correct version is downloaded and installed, allowing you to control the process manually.
 
+## Example: Fetch Temperature for a Date
+
+The script `src/get_temperature.py` demonstrates how to obtain the minimum and maximum
+temperature for a specific day using the [Open‑Meteo](https://open-meteo.com/) API.
+It opens the API endpoint in a headless `CustomChromeDriver` session and parses the
+returned JSON data.
+
+Run the script with a date (and optionally latitude and longitude) to retrieve the
+temperature in Celsius:
+
+```bash
+python src/get_temperature.py 2023-06-01 --latitude 35.6895 --longitude 139.6917
+```
+
 ## License
 
 This project is licensed under the terms of the [LICENSE](LICENSE) file.
