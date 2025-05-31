@@ -6,7 +6,6 @@ from io import StringIO
 from pathlib import Path
 import winreg
 import subprocess
-import tempfile
 
 import requests
 from packaging import version
@@ -276,13 +275,19 @@ class CustomChromeDriver(webdriver.Chrome):
             If the download does not complete within the specified timeout.
         """
         if extensions is None:
-            pattern = '*'
+            patterns = ['*']
         elif isinstance(extensions, str):
-            pattern = f"*.{extensions}"
+            patterns = [f"*.{extensions}"]
         else:
-            pattern = f"*{{{','.join(extensions)}}}"
-        
-        download_folder_existing_files = set(self.download_folder.glob(pattern))
+            patterns = [f"*.{ext}" for ext in extensions]
+
+        def glob_all(patterns):
+            files = []
+            for p in patterns:
+                files.extend(self.download_folder.glob(p))
+            return set(files)
+
+        download_folder_existing_files = glob_all(patterns)
     
         # ダウンロードリンクに移動
         self.get(download_link)
@@ -291,7 +296,7 @@ class CustomChromeDriver(webdriver.Chrome):
         downloaded_file_path = None
         start_time = time.time()
         while time.time() - start_time < timeout:
-            new_files = set(self.download_folder.glob(pattern)) - download_folder_existing_files
+            new_files = glob_all(patterns) - download_folder_existing_files
             if new_files:
                 downloaded_file_path = list(new_files)[0]
                 break
