@@ -330,6 +330,13 @@ class CustomChromeDriver(webdriver.Chrome):
         )
         Select(select_element).select_by_value(value)
 
+    def select_by_visible_text(self, xpath, text):
+        # ドロップダウンメニューが表示されるまで待機
+        select_element = WebDriverWait(self, 10).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+        Select(select_element).select_by_visible_text(text)
+
     def submit_form(self, xpath):
         # フォームが表示されるまで待機
         form = WebDriverWait(self, 10).until(
