@@ -316,9 +316,9 @@ class CustomChromeDriver(webdriver.Chrome):
         field.send_keys(value)
 
     def click(self, xpath):
-        # ボタンがDOMに出てくるまで待機
+        # ボタンがクリックできるようになるまで待機
         button = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
+            EC.element_to_be_clickable((By.XPATH, xpath))
         )
         # ボタンをクリック
         button.click()
