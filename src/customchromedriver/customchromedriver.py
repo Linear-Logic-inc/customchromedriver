@@ -313,16 +313,23 @@ class CustomChromeDriver(webdriver.Chrome):
             EC.presence_of_element_located((By.XPATH, xpath))
         )
 
+    def wait_for_xpath_visible(self, xpath, timeout=10):
+        return WebDriverWait(self, timeout).until(
+            EC.visibility_of_element_located((By.XPATH, xpath))
+        )
+
     def send_keys(self, xpath, value):
         # フィールドが表示されるまで待機
-        field = self.wait_for_xpath(xpath)
+        field = self.wait_for_xpath_visible(xpath)
         
         # 値を入力
         field.send_keys(value)
 
     def click(self, xpath):
         # ボタンがクリックできるようになるまで待機
-        button = self.wait_for_xpath(xpath)
+        button = WebDriverWait(self, 10).until(
+            EC.element_to_be_clickable((By.XPATH, xpath))
+        )
         
         # ボタンをクリック
         button.click()
