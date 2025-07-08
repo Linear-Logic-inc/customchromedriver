@@ -307,41 +307,42 @@ class CustomChromeDriver(webdriver.Chrome):
     
         return downloaded_file_path
 
+    def wait_for_xpath(self, xpath, timeout=10):
+        """指定したXPathに一致する要素が表示されるまで待機"""
+        return WebDriverWait(self, timeout).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+
     def send_keys(self, xpath, value):
         # フィールドが表示されるまで待機
-        field = WebDriverWait(self, 10).until(
-            EC.visibility_of_element_located((By.XPATH, xpath))
-        )
+        field = self.wait_for_xpath(xpath)
+        
         # 値を入力
         field.send_keys(value)
 
     def click(self, xpath):
         # ボタンがクリックできるようになるまで待機
-        button = WebDriverWait(self, 10).until(
-            EC.element_to_be_clickable((By.XPATH, xpath))
-        )
+        button = self.wait_for_xpath(xpath)
+        
         # ボタンをクリック
         button.click()
 
     def select_by_value(self, xpath, value):
         # ドロップダウンメニューが表示されるまで待機
-        select_element = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        select_element = self.wait_for_xpath(xpath)
+        
         Select(select_element).select_by_value(value)
 
     def select_by_visible_text(self, xpath, text):
         # ドロップダウンメニューが表示されるまで待機
-        select_element = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        select_element = self.wait_for_xpath(xpath)
+        
         Select(select_element).select_by_visible_text(text)
 
     def submit_form(self, xpath):
         # フォームが表示されるまで待機
-        form = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        form = self.wait_for_xpath(xpath)
+        
         # フォームを送信
         form.submit()
 
