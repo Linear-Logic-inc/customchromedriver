@@ -6,7 +6,6 @@ from io import StringIO
 from pathlib import Path
 import winreg
 import subprocess
-import tempfile
 
 import requests
 from packaging import version
@@ -302,14 +301,20 @@ class CustomChromeDriver(webdriver.Chrome):
             If the download does not complete within the specified timeout.
         """
         if extensions is None:
-            pattern = "*"
+            patterns = ['*']
         elif isinstance(extensions, str):
-            pattern = f"*.{extensions}"
+            patterns = [f"*.{extensions}"]
         else:
-            pattern = f"*{{{','.join(extensions)}}}"
+            patterns = [f"*.{ext}" for ext in extensions]
 
-        download_folder_existing_files = set(self.download_folder.glob(pattern))
+        def glob_all(patterns):
+            files = []
+            for p in patterns:
+                files.extend(self.download_folder.glob(p))
+            return set(files)
 
+        download_folder_existing_files = glob_all(patterns)
+    
         # ダウンロードリンクに移動
         self.get(download_link)
 
@@ -317,9 +322,8 @@ class CustomChromeDriver(webdriver.Chrome):
         downloaded_file_path = None
         start_time = time.time()
         while time.time() - start_time < timeout:
-            new_files = (
-                set(self.download_folder.glob(pattern)) - download_folder_existing_files
-            )
+            new_files = glob_all(patterns) - download_folder_existing_files
+            
             if new_files:
                 downloaded_file_path = list(new_files)[0]
                 break
@@ -330,34 +334,49 @@ class CustomChromeDriver(webdriver.Chrome):
 
         return downloaded_file_path
 
-    def send_keys(self, xpath, value):
-        # フィールドが表示されるまで待機
-        field = WebDriverWait(self, 10).until(
+    def wait_for_xpath(self, xpath, timeout=10):
+        """指定したXPathに一致する要素が表示されるまで待機"""
+        return WebDriverWait(self, timeout).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+
+    def wait_for_xpath_visible(self, xpath, timeout=10):
+        return WebDriverWait(self, timeout).until(
             EC.visibility_of_element_located((By.XPATH, xpath))
         )
+
+    def send_keys(self, xpath, value):
+        # フィールドが表示されるまで待機
+        field = self.wait_for_xpath_visible(xpath)
+        
         # 値を入力
         field.send_keys(value)
 
     def click(self, xpath):
-        # ボタンがDOMに出てくるまで待機
+        # ボタンがクリックできるようになるまで待機
         button = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
+            EC.element_to_be_clickable((By.XPATH, xpath))
         )
+        
         # ボタンをクリック
         button.click()
 
     def select_by_value(self, xpath, value):
         # ドロップダウンメニューが表示されるまで待機
-        select_element = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        select_element = self.wait_for_xpath(xpath)
+        
         Select(select_element).select_by_value(value)
+
+    def select_by_visible_text(self, xpath, text):
+        # ドロップダウンメニューが表示されるまで待機
+        select_element = self.wait_for_xpath(xpath)
+        
+        Select(select_element).select_by_visible_text(text)
 
     def submit_form(self, xpath):
         # フォームが表示されるまで待機
-        form = WebDriverWait(self, 10).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        form = self.wait_for_xpath(xpath)
+        
         # フォームを送信
         form.submit()
 

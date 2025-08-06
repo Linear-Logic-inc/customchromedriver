@@ -52,7 +52,7 @@ print(f"Downloaded file: {downloaded_file}")
 
 ### 3. Interacting with Web Elements
 
-Use the custom methods `send_keys`, `click`, `select_by_value`, and `submit_form` to interact with web elements:
+Use the custom methods `send_keys`, `click`, `select_by_value`, `select_by_visible_text`, and `submit_form` to interact with web elements:
 
 ```python
 driver.send_keys("//input[@id='search']", "search term")
