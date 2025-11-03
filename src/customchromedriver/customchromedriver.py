@@ -352,14 +352,19 @@ class CustomChromeDriver(webdriver.Chrome):
         # 値を入力
         field.send_keys(value)
 
-    def click(self, xpath):
+    def click(self, xpath, js=False):
         # ボタンがクリックできるようになるまで待機
         button = WebDriverWait(self, 10).until(
             EC.element_to_be_clickable((By.XPATH, xpath))
         )
-        
-        # ボタンをクリック
-        button.click()
+
+        if js:
+            # スクロールしないと見えない場合など
+            # ボタンをjavascriptからクリック
+            self.execute_script("arguments[0].scrollIntoView({block:'center'}); arguments[0].click();", button)
+        else:
+            # ボタンをクリック
+            button.click()
 
     def select_by_value(self, xpath, value):
         # ドロップダウンメニューが表示されるまで待機
